@@ -34,6 +34,9 @@
       </v-btn>
       <v-sheet>
         运行日志： 处理中： {{ logs.length }}/{{ files.length }}
+        <v-btn @click="exportFile">
+          导出 {{ pages.length }} 个笔记为单个文件
+        </v-btn>
         <v-list-item v-for="i in logs" :key="i">
           {{ i }}
         </v-list-item>
@@ -78,6 +81,7 @@ export default Vue.extend({
     files: string[]
     logs: string[]
     deleteUseless: boolean
+    pages: WebPage[]
   } {
     return {
       input:
@@ -86,6 +90,7 @@ export default Vue.extend({
       files: [],
       logs: [],
       deleteUseless: false,
+      pages: [],
     }
   },
   computed: {
@@ -119,6 +124,7 @@ export default Vue.extend({
                       const page = decodeTextToWebPage(text, this.secretKey)
                       if (page) {
                         pages.push(page)
+                        this.pages = pages
                         this.logs.push(`${file} : 解密成功`)
                       } else {
                         this.logs.push(`${file}: 解密失败或无效文件，请检查`)
@@ -150,6 +156,13 @@ export default Vue.extend({
           })
         }
       })
+    },
+    exportFile() {
+      if (this.pages.length === 0) {
+        alert('没有可导出的数据')
+        return
+      }
+      exportPages(this.pages)
     },
   },
 })
