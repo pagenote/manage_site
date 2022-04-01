@@ -105,35 +105,48 @@ export default Vue.extend({
       }
       lfs.setRoot().then((result) => {
         if (result) {
-          lfs.readdir('/').then(async (result) => {
+          lfs.readdir('/').then((result) => {
             this.files = result
-            const pages = []
+            const pages: WebPage[] = []
+            const tasks = []
+
             for (let i = 0; i < result.length; i++) {
               const file = result[i]
-              const text = await lfs.readFile('/' + file)
-              if (text.length > 100) {
-                const page = decodeTextToWebPage(text, this.secretKey)
-                if (page) {
-                  pages.push(page)
-                  this.logs.push(`${file} : 解密成功`)
-                } else {
-                  this.logs.push(`${file}: 解密失败或无效文件，请检查`)
-                }
-              } else {
-                this.logs.push(
-                  `${file}: 这是一个空数据文件 ${
-                    this.deleteUseless ? '已经将其自动删除' : '建议你将其删除'
-                  }`
-                )
-                lfs.unlink('/' + file)
+              tasks.push(
+                new Promise((resolve) => {
+                  lfs.readFile('/' + file).then((text) => {
+                    if (text.length > 100) {
+                      const page = decodeTextToWebPage(text, this.secretKey)
+                      if (page) {
+                        pages.push(page)
+                        this.logs.push(`${file} : 解密成功`)
+                      } else {
+                        this.logs.push(`${file}: 解密失败或无效文件，请检查`)
+                      }
+                    } else {
+                      this.logs.push(
+                        `${file}: 这是一个空数据文件 ${
+                          this.deleteUseless
+                            ? '已经将其自动删除'
+                            : '建议你将其删除'
+                        }`
+                      )
+                      lfs.unlink('/' + file)
+                    }
+                    resolve(null)
+                  })
+                })
+              )
+            }
+
+            Promise.all(tasks).then(function () {
+              const checkConfirm = confirm(
+                `成功解析到 ${pages.length} 个文件，确定导出吗？`
+              )
+              if (checkConfirm) {
+                exportPages(pages)
               }
-            }
-            const checkConfirm = confirm(
-              `成功解析到 ${pages.length} 个文件，确定导出吗？`
-            )
-            if (checkConfirm) {
-              exportPages(pages)
-            }
+            })
           })
         }
       })
