@@ -24,12 +24,16 @@
         label="秘钥"
         placeholder="输入秘钥，注意不是云盘账号密码，是你在 PAGENOTE 绑定账号时候设置的数据加密秘钥。没有或错误的秘钥将无法读取数据。"
       ></v-text-field>
+      <v-checkbox
+        v-model="deleteUseless"
+        label="自动删除空数据文件"
+      ></v-checkbox>
       <v-btn @click="setDir">
         通过云盘数据生成备份文件（适用与通过 webdav 同步产生的数据，数据根目录为
         pages）
       </v-btn>
       <v-sheet>
-        运行日志：
+        运行日志： 处理中： {{ logs.length }}/{{ files.length }}
         <v-list-item v-for="i in logs" :key="i">
           {{ i }}
         </v-list-item>
@@ -73,6 +77,7 @@ export default Vue.extend({
     secretKey: string
     files: string[]
     logs: string[]
+    deleteUseless: boolean
   } {
     return {
       input:
@@ -80,6 +85,7 @@ export default Vue.extend({
       secretKey: '',
       files: [],
       logs: [],
+      deleteUseless: false,
     }
   },
   computed: {
@@ -113,6 +119,13 @@ export default Vue.extend({
                 } else {
                   this.logs.push(`${file}: 解密失败或无效文件，请检查`)
                 }
+              } else {
+                this.logs.push(
+                  `${file}: 这是一个空数据文件 ${
+                    this.deleteUseless ? '已经将其自动删除' : '建议你将其删除'
+                  }`
+                )
+                lfs.unlink('/' + file)
               }
             }
             const checkConfirm = confirm(
