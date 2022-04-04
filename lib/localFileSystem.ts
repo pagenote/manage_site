@@ -59,10 +59,11 @@ interface Props {
   rootDirctoryHandle?: FileSystemDirectoryHandle
 }
 export default class LocalFileSystem {
-  private rootDirctoryHandle: FileSystemDirectoryHandle | null
+  private rootDirctoryHandle: FileSystemDirectoryHandle | null = null
+  public rootName = ''
 
   constructor(props: Props) {
-    this.rootDirctoryHandle = props.rootDirctoryHandle || null
+    this.setRootHandle(props.rootDirctoryHandle)
   }
 
   public async setRoot(): Promise<FileSystemDirectoryHandle | null> {
@@ -72,6 +73,20 @@ export default class LocalFileSystem {
     }
     this.rootDirctoryHandle = directoryHandle
     return directoryHandle
+  }
+
+  public setRootHandle(handle?: FileSystemDirectoryHandle) {
+    if (handle) {
+      this.rootDirctoryHandle = handle
+      this.rootName = this.rootDirctoryHandle?.name || ''
+    }
+  }
+
+  public async requestPermission(
+    mode: FileSystemPermissionMode = 'readwrite'
+  ): Promise<boolean> {
+    const permission = await verifyPermission(this.rootDirctoryHandle, mode)
+    return !!permission
   }
 
   public async getHandleAndPathArray(
@@ -105,7 +120,6 @@ export default class LocalFileSystem {
   public async readFile(path: string): Promise<string> {
     const handleAndPathArray = await this.getHandleAndPathArray(path, 'read')
     let directoryHandle = handleAndPathArray.handle
-    console.log(path, handleAndPathArray)
     const pathArr = handleAndPathArray.pathArray
     if (!directoryHandle) {
       throw new Error(`${path} is not valid`)

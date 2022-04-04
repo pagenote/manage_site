@@ -28,7 +28,9 @@
             </v-card-text>
           </v-card>
 
-          <v-btn color="primary" @click="setDir"> 选择文件夹 </v-btn>
+          <v-btn color="primary" @click="setDir">
+            选取/授权文件夹 {{ lfs.rootName ? lfs.rootName : '' }}
+          </v-btn>
         </v-stepper-content>
 
         <v-stepper-content step="2">
@@ -85,12 +87,20 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import localforage from 'localforage'
 import { WebPage } from '@pagenote/shared/lib/@types/data'
 import { makeExportString } from '@pagenote/shared/lib/utils/data'
 import { contentToFile } from '@pagenote/shared/lib/utils/document'
 import LocalFileSystem from '../../lib/localFileSystem'
 import { decodeTextToWebPage } from '~/utils'
-const lfs = new LocalFileSystem({})
+localforage.config({
+  driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE], // 使用 WebSQL；也可以使用 setDriver()
+  name: 'pagenote',
+  version: 1.0,
+  size: 4980736, // 数据库的大小，单位为字节。现仅 WebSQL 可用
+  storeName: 'handlers', // 仅接受字母，数字和下划线
+  description: 'pagenote handlers',
+})
 
 const exportPages = (pages: WebPage[]) => {
   const version = '0.20.14'
@@ -113,6 +123,7 @@ export default Vue.extend({
     pages: WebPage[]
     secretKey: string
     resolving: boolean
+    lfs: LocalFileSystem
   } {
     return {
       e1: 1,
@@ -122,14 +133,34 @@ export default Vue.extend({
       pages: [],
       secretKey: '',
       resolving: false,
+      lfs: new LocalFileSystem({}),
     }
+  },
+  mounted() {
+    const that = this
+    localforage
+      .getItem<FileSystemDirectoryHandle>('handler')
+      .then(function (item) {
+        if (item) {
+          that.lfs.setRootHandle(item)
+          const onclick = async function () {
+            const result = await that.lfs.requestPermission('readwrite')
+            if (result) {
+              that.readDir()
+            }
+            document.removeEventListener('click', onclick)
+          }
+          document.addEventListener('click', onclick)
+        }
+      })
   },
   methods: {
     setDir() {
-      lfs
+      this.lfs
         .setRoot()
         .then((result) => {
           if (result) {
+            localforage.setItem('handler', result)
             this.e1 = 2
             this.readDir()
           } else {
@@ -142,10 +173,11 @@ export default Vue.extend({
     },
     readDir() {
       const that = this
+      that.e1 = 2
       this.logs = []
       this.pages = []
       this.resolving = true
-      lfs
+      this.lfs
         .readdir('/', { deep: true, fileFilter: /\.pagenote\.html$/ })
         .then((result) => {
           this.files = result
@@ -156,7 +188,7 @@ export default Vue.extend({
             const file = result[i]
             tasks.push(
               new Promise((resolve) => {
-                lfs.readFile(file).then((text) => {
+                this.lfs.readFile(file).then((text) => {
                   if (text.length > 100) {
                     const page = decodeTextToWebPage(text, this.secretKey)
                     if (page) {
@@ -174,7 +206,7 @@ export default Vue.extend({
                           : '建议你将其删除'
                       }`
                     )
-                    lfs.unlink('/' + file)
+                    this.lfs.unlink('/' + file)
                   }
                   resolve(null)
                 })
