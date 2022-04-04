@@ -85,10 +85,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import LocalFileSystem from '@pagenote/shared/lib/library/localFileSystem'
 import { WebPage } from '@pagenote/shared/lib/@types/data'
 import { makeExportString } from '@pagenote/shared/lib/utils/data'
 import { contentToFile } from '@pagenote/shared/lib/utils/document'
+import LocalFileSystem from '../../lib/localFileSystem'
 import { decodeTextToWebPage } from '~/utils'
 const lfs = new LocalFileSystem({})
 
@@ -143,45 +143,50 @@ export default Vue.extend({
     readDir() {
       const that = this
       this.logs = []
+      this.pages = []
       this.resolving = true
-      lfs.readdir('/').then((result) => {
-        this.files = result
-        const pages: WebPage[] = []
-        const tasks = []
+      lfs
+        .readdir('/', { deep: true, fileFilter: /\.pagenote\.html$/ })
+        .then((result) => {
+          this.files = result
+          const pages: WebPage[] = []
+          const tasks = []
 
-        for (let i = 0; i < result.length; i++) {
-          const file = result[i]
-          tasks.push(
-            new Promise((resolve) => {
-              lfs.readFile('/' + file).then((text) => {
-                if (text.length > 100) {
-                  const page = decodeTextToWebPage(text, this.secretKey)
-                  if (page) {
-                    pages.push(page)
-                    this.pages = pages
-                    this.logs.push(`${file} : 解密成功`)
+          for (let i = 0; i < result.length; i++) {
+            const file = result[i]
+            tasks.push(
+              new Promise((resolve) => {
+                lfs.readFile(file).then((text) => {
+                  if (text.length > 100) {
+                    const page = decodeTextToWebPage(text, this.secretKey)
+                    if (page) {
+                      pages.push(page)
+                      this.pages = pages
+                      this.logs.push(`${file} : 解密成功`)
+                    } else {
+                      this.logs.push(`${file}: 解密失败或无效文件，请检查`)
+                    }
                   } else {
-                    this.logs.push(`${file}: 解密失败或无效文件，请检查`)
+                    this.logs.push(
+                      `${file}: 这是一个空数据文件 ${
+                        this.deleteUseless
+                          ? '已经将其自动删除'
+                          : '建议你将其删除'
+                      }`
+                    )
+                    lfs.unlink('/' + file)
                   }
-                } else {
-                  this.logs.push(
-                    `${file}: 这是一个空数据文件 ${
-                      this.deleteUseless ? '已经将其自动删除' : '建议你将其删除'
-                    }`
-                  )
-                  lfs.unlink('/' + file)
-                }
-                resolve(null)
+                  resolve(null)
+                })
               })
-            })
-          )
-        }
+            )
+          }
 
-        Promise.all(tasks).then(function () {
-          that.resolving = false
-          that.e1 = 3
+          Promise.all(tasks).then(function () {
+            that.resolving = false
+            that.e1 = 3
+          })
         })
-      })
     },
     exportFile() {
       if (this.pages.length === 0) {
