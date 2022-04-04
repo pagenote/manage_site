@@ -55,8 +55,8 @@ import Vue from 'vue'
 import { makeExportString } from '@pagenote/shared/lib/utils/data'
 import { contentToFile } from '@pagenote/shared/lib/utils/document'
 import { WebPage } from '@pagenote/shared/lib/@types/data'
+import LocalFileSystem from '@pagenote/shared/lib/library/localFileSystem'
 import { decodeTextToWebPage } from '@/utils'
-import LocalFileSystem from '@/lib/localFileSystem'
 
 const exportPages = (pages: WebPage[]) => {
   const version = '0.20.14'
@@ -69,9 +69,7 @@ const exportPages = (pages: WebPage[]) => {
   contentToFile(dataString, `${version}_${pages.length}.pagenote`)
 }
 
-const lfs = new LocalFileSystem({
-  rootname: 'read',
-})
+const lfs = new LocalFileSystem({})
 
 export default Vue.extend({
   name: 'DataResolver',
