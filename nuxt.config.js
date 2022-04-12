@@ -34,6 +34,9 @@ export default {
     '@nuxtjs/stylelint-module',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    // https://github.com/nuxt-community/tailwindcss-module
+    // '@nuxtjs/tailwindcss',
+    '@nuxtjs/google-fonts',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -56,10 +59,35 @@ export default {
       lang: 'en',
     },
   },
-
+  // https://google-fonts.nuxtjs.org/options
+  googleFonts: {
+    download: true,
+    display: 'swap', // 'auto' | 'block' | 'swap' | 'fallback' | 'optional'
+    families: {
+      sans: true,
+      Roboto: true,
+      'Work Sans': true,
+      'Josefin+Sans': true,
+      'Rubik Moonrocks': true,
+      'Rubik Wet Paint': true,
+      Lato: [100, 300],
+      Raleway: {
+        wght: [100, 400],
+        ital: [100],
+      },
+    },
+    prefetch: true,
+    preconnect: true,
+  },
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
+    treeShake: true,
     customVariables: ['~/assets/variables.scss'],
+    defaultAssets: {
+      font: {
+        family: 'sans',
+      },
+    },
     theme: {
       dark: false,
       themes: {
