@@ -1,7 +1,8 @@
 <template>
   <v-app>
     <v-navigation-drawer
-      v-model="drawer"
+      :value="drawer"
+      :stateless="false"
       :mini-variant="miniVariant"
       :clipped="clipped"
       :width="200"
@@ -10,17 +11,11 @@
     >
       <div
         class="menu-bar"
-        @mouseenter.stop="toggleMinDrawer"
-        @mouseleave.stop="toggleMinDrawer"
+        @mouseenter.stop="toggleMinDrawer(false)"
+        @mouseleave.stop="toggleMinDrawer(true)"
       >
         <v-list>
-          <v-list-item
-            v-for="(item, i) in items"
-            :key="i"
-            :to="item.to"
-            router
-            exact
-          >
+          <v-list-item v-for="(item, i) in items" :key="i" :to="item.to" router>
             <v-list-item-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-action>
@@ -37,9 +32,6 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <!--        <v-btn icon class='toggle-draw-btn'>-->
-        <!--          <v-app-bar-nav-icon @click.stop="drawer = !drawer" />-->
-        <!--        </v-btn>-->
       </div>
     </v-navigation-drawer>
     <!--    <v-app-bar :clipped-left="clipped" fixed app>-->
@@ -58,7 +50,10 @@
     <!--        <v-icon>mdi-menu</v-icon>-->
     <!--      </v-btn>-->
     <!--    </v-app-bar>-->
-    <v-main>
+    <v-main class="grey lighten-3">
+      <v-btn icon class="toggle-draw-btn">
+        <v-app-bar-nav-icon @click.stop="toggleShowDraw(!drawer)" />
+      </v-btn>
       <v-container>
         <Nuxt />
       </v-container>
@@ -72,29 +67,44 @@
   </v-app>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+import getCacheInstance from '@pagenote/shared/lib/library/cache'
+const drawCache = getCacheInstance<boolean>('draw', {defaultValue: false})
+export default Vue.extend({
   name: 'DefaultLayout',
-  data() {
+  data(): {
+    drawer: boolean
+    clipped: boolean
+    fixed: boolean
+    items: {
+      icon: string
+      title: string
+      to: string
+    }[]
+    miniVariant: boolean
+    right: boolean
+    rightDrawer: boolean
+  } {
     return {
       clipped: false,
       drawer: false,
       fixed: false,
       items: [
-        {
-          icon: 'mdi-marker',
-          title: '标记',
-          to: '/data/webpage',
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: '剪切板',
-          to: '/clipboard',
-        },
+        // {
+        //   icon: 'mdi-marker',
+        //   title: '标记',
+        //   to: '/data/webpage',
+        // },
+        // {
+        //   icon: 'mdi-chart-bubble',
+        //   title: '剪切板',
+        //   to: '/clipboard',
+        // },
         {
           icon: 'mdi-cogs',
           title: '设置',
-          to: '/setting',
+          to: '/setting/files',
         },
         // {
         //   icon: 'mdi-chart-bubble',
@@ -105,19 +115,33 @@ export default {
       miniVariant: true,
       right: true,
       rightDrawer: false,
-      title: 'PAGENOTE DATA CENTER',
     }
   },
+  mounted() {
+    const defaultDrawer = drawCache.get()
+    this.drawer = defaultDrawer
+  },
   methods: {
-    toggleMinDrawer() {
-      this.miniVariant = !this.miniVariant
+    toggleMinDrawer(min: boolean): void {
+      this.miniVariant = min
+    },
+    toggleShowDraw(drawer: boolean): void {
+      this.drawer = drawer
+      drawCache.set(drawer)
     },
   },
-}
+})
 </script>
 
-<style>
+<style lang="scss" scoped>
 .menu-bar {
   height: 100%;
+}
+
+.toggle-draw-btn {
+  position: fixed;
+  z-index: 9;
+  left: 10px;
+  bottom: 10px;
 }
 </style>

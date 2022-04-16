@@ -2,3 +2,7 @@
 //
 // The variables you want to modify
 // $font-size-root: 20px;
+// https://github.com/vuetifyjs/vuetify/tree/master/packages/vuetify/src/styles/settings
+
+@import '~vuetify/src/styles/settings/_variables.scss';
+$btn-text-transform: initial;
