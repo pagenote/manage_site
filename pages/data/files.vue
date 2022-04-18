@@ -523,7 +523,9 @@ export default Vue.extend({
               this.syncDetail.push(syncDetail);
 
               if (pageFromFile) {
+                console.time(pageFromFile.key)
                 this.importPageToExt(pageFromFile,(result)=>{
+                  console.timeEnd(pageFromFile.key)
                   if(result.imported){
                     syncDetail.status = FileResolveStatus.successImport;
                   } else{
@@ -600,7 +602,7 @@ export default Vue.extend({
     importPageToExt(webpage: WebPage,callback:(result:{imported: boolean,webpage:WebPage|null,diffType:DiffType})=>void){
       // @ts-ignore
       getBridge().sendMessage('IMPORT_LIGHT_PAGES',[webpage],({ data })=>{
-        callback( data.success ? data.data[0] :{
+        callback( (data && data.success) ? data.data[0] :{
           webpage: null,
           imported: false
         });
