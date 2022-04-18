@@ -11,6 +11,8 @@ export interface PathStat {
 interface Filter {
   dirFilter?: RegExp
   fileFilter?: RegExp
+  excludeFileFilter?: RegExp
+  excludeDirFilter?: RegExp
   deep: boolean
 }
 
@@ -72,6 +74,7 @@ export default class LocalFileSystem {
       return null
     }
     this.rootDirctoryHandle = directoryHandle
+    this.setRootHandle(directoryHandle)
     return directoryHandle
   }
 
@@ -99,10 +102,7 @@ export default class LocalFileSystem {
     const directoryHandle = this.rootDirctoryHandle
     const permission = await verifyPermission(directoryHandle, mode)
     if (!permission) {
-      return {
-        handle: null,
-        pathArray: [],
-      }
+      throw new Error(`无文件 ${path} ${mode}夹权限`)
     }
     const pathArr = path
       .replace(/\/+$/, '')
@@ -131,7 +131,6 @@ export default class LocalFileSystem {
       const file = await (
         await directoryHandle.getFileHandle(pathArr[i])
       ).getFile()
-
       return file.text()
 
       // if (opts.encoding && opts.encoding.match(/^utf-?8$/i)) {
@@ -185,6 +184,23 @@ export default class LocalFileSystem {
       const names = []
       for await (const entry of directoryHandle.values()) {
         const fullPathName = concatPaths([path, entry.name])
+
+        if (filter?.excludeDirFilter) {
+          if (entry.kind === 'directory') {
+            if (filter.excludeDirFilter.test(entry.name)) {
+              continue
+            }
+          }
+        }
+
+        if (filter?.excludeFileFilter) {
+          if (entry.kind === 'file') {
+            if (filter.excludeFileFilter.test(entry.name)) {
+              continue
+            }
+          }
+        }
+
         if (filter?.fileFilter) {
           if (entry.kind === 'file' && filter.fileFilter.test(fullPathName)) {
             names.push(fullPathName)
