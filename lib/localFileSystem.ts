@@ -45,7 +45,7 @@ export async function verifyPermission(
   return false
 }
 
-function concatPaths(pathArray: string[]) {
+export function concatPaths(pathArray: string[]) {
   let path = ''
   for (let i = 0; i < pathArray.length; i++) {
     const suffix = i !== pathArray.length - 1 ? '/' : ''
@@ -63,6 +63,7 @@ interface Props {
 export default class LocalFileSystem {
   private rootDirctoryHandle: FileSystemDirectoryHandle | null = null
   public rootName = ''
+  public hasPermission = false
 
   constructor(props: Props) {
     this.setRootHandle(props.rootDirctoryHandle)
@@ -83,13 +84,15 @@ export default class LocalFileSystem {
       this.rootDirctoryHandle = handle
       this.rootName = this.rootDirctoryHandle?.name || ''
     }
+    this.requestPermission()
   }
 
   public async requestPermission(
     mode: FileSystemPermissionMode = 'readwrite'
   ): Promise<boolean> {
     const permission = await verifyPermission(this.rootDirctoryHandle, mode)
-    return !!permission
+    this.hasPermission = !!permission
+    return this.hasPermission
   }
 
   public async getHandleAndPathArray(
@@ -228,6 +231,7 @@ export default class LocalFileSystem {
   }
 
   public async unlink(path: string): Promise<void> {
+    path = concatPaths(['/', path])
     const result = await this.getHandleAndPathArray(path, 'readwrite')
     let directoryHandle = result.handle
     const pathArr = result.pathArray
@@ -242,7 +246,7 @@ export default class LocalFileSystem {
     }
   }
 
-  public async stats(path: string): Promise<PathStat> {
+  public async stats(path: string): Promise<PathStat | null> {
     const result = await this.getHandleAndPathArray(path, 'read')
     let directoryHandle = result.handle
     const pathArr = result.pathArray
@@ -272,11 +276,13 @@ export default class LocalFileSystem {
   }
 
   public async mkdir(path: string): Promise<FileSystemDirectoryHandle> {
-    const result = await this.getHandleAndPathArray(path, 'readwrite')
+    const filepath = concatPaths(['/', path])
+    console.log(filepath, '--')
+    const result = await this.getHandleAndPathArray(filepath, 'readwrite')
     let directoryHandle = result.handle
     const pathArr = result.pathArray
     if (!directoryHandle) {
-      throw new Error(`${path} is not valid`)
+      throw new Error(`${filepath} is not valid`)
     } else {
       for (let i = 0; i < pathArr.length; i++) {
         directoryHandle = await directoryHandle.getDirectoryHandle(pathArr[i], {

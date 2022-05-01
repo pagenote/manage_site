@@ -14,12 +14,12 @@ interface Diff {
 }
 
 export const diffWebPages = function (
-  currentPage: WebPage,
-  comparePage: WebPage
+  currentPage: WebPage | undefined | null,
+  comparePage: WebPage | undefined | null
 ): Diff {
   const diffTime =
-    (currentPage?.updateAt || currentPage?.createAt || 0) -
-    (comparePage?.updateAt || comparePage?.createAt || 0)
+    +(currentPage?.updateAt || currentPage?.createAt || 0) -
+    +(comparePage?.updateAt || comparePage?.createAt || 0)
 
   const hoursDiff = diffTime / 1000 / 3600
   const diff: Diff = {

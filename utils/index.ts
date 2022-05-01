@@ -6,24 +6,25 @@ import { WebPageItem } from '@pagenote/shared/lib/models/WebPageItem'
 function decodeTextToWebPage(
   txt: string,
   secretKey: string
-): WebPage | null | undefined {
-  let downloadWebPage = null
+): WebPage | undefined {
+  let downloadWebPage
   // TODO 下载内容中文会出现乱码问题
   try {
-    let text = txt.toString()
-    if (secretKey) {
-      try {
-        text = Aes.decrypt(text, secretKey).toString(Crypto.enc.Utf8)
-      } catch (e) {
-        // console.warn('解密失败')
-      }
-      text = text || txt.toString()
-    }
+    const text = txt.toString()
     downloadWebPage = JSON.parse(text)
   } catch (e) {
+    if (secretKey) {
+      try {
+        const text = Aes.decrypt(txt.toString(), secretKey).toString(
+          Crypto.enc.Utf8
+        )
+        downloadWebPage = JSON.parse(text)
+      } catch (e) {
+        // return undefined
+      }
+    }
     // eslint-disable-next-line no-console
-    console.error('解析错误', e, txt)
-    return undefined
+    // console.error('解析错误', e, txt)
   }
 
   // 文件数据确定解析成功
@@ -33,7 +34,6 @@ function decodeTextToWebPage(
   } else {
     // eslint-disable-next-line no-console
     console.error(webpage, '空数据')
-    return null
   }
 }
 
