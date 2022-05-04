@@ -1,5 +1,5 @@
 <template>
-  <div ref='root' class='abstract-card'>
+  <div ref='root' class='abstract-card' :class='{"active":active}' @click='getDetail'>
     <div v-if='webpage || loading'>
       <div v-if='webpage && webpage.deleted'>
         已删除
@@ -12,7 +12,14 @@
             :boilerplate='true'
           ></v-skeleton-loader>
           <div v-else-if='webpage'>
-            <v-avatar :size='16'>
+            <v-simple-checkbox
+              color='primary'
+              :ripple='false'
+              :value='checked'
+              class='page-checkbox'
+              :class='{checked: checked}'
+              @input='toggleCheck' />
+            <v-avatar class='page-icon' :size='16'>
               <img
                 :src='webpage?webpage.icon:""'
                 alt=""
@@ -91,7 +98,17 @@ export default Vue.extend({
       type: Number as PropType<number>,
       default: 0,
       required: true,
-    }
+    },
+    checked:{
+      type: Boolean as PropType<boolean>,
+      default: false,
+      required: true,
+    },
+    active:{
+      type: Boolean as PropType<boolean>,
+      default: false,
+      required: true,
+    },
   },
   data():{
     webpage?: WebPage,
@@ -154,7 +171,6 @@ export default Vue.extend({
       if(this.fetchTimes===0){
         this.loading = true
       }
-      this.fetchTimes++
       const label = Math.random()+this.pageKey
       console.time(label)
       // 字段过滤，避免返回不需要的内容占用内存，如 snapshot
@@ -163,8 +179,10 @@ export default Vue.extend({
         if(res.success){
           const data = res.data.pages[0] as WebPage;
           this.webpage = data
-          this.loading = false;
+          this.fetchTimes++
         }
+      }).finally(()=>{
+        this.loading = false;
       })
       // api.lightpage.getLightPageDetail({key:this.pageKey}).then((res)=>{
       //     console.timeEnd(label)
@@ -173,24 +191,53 @@ export default Vue.extend({
       //       this.webpage = data
       //     }
       // })
+    },
+    toggleCheck(){
+      this.$emit('toggleCheck',this.pageKey)
     }
   }
 })
 </script>
 
 <style scoped lang='scss'>
+@import "assets/variables.scss";
 .abstract-card{
+  position: relative;
   user-select: none;
   width: 100%;
   color: #444;
   padding: 12px 32px;
+  padding-left: 24px;
   font-size: 14px;
   min-height: 64px;
   border-bottom: 1px solid #eae6e6;
+  &.active{
+    background: #ffedbd;
+  }
   .card-title{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .v-input--selection-controls__input{
+    margin: 0;
+  }
+
+  .page-checkbox{
+    position: absolute;
+    z-index: $abstract-checkbox-index;
+    left: 24px;
+    display: none;
+    background: #fff;
+    &.checked{
+      display: inline-block;
+    }
+  }
+  &:hover{
+    .page-checkbox{
+      display: inline-block;
+    }
   }
 }
 </style>

@@ -52,6 +52,7 @@ import Vue, { PropType } from 'vue'
 import generateApi from '@pagenote/shared/lib/generateApi'
 import { WebPage } from '@pagenote/shared/lib/@types/data'
 import { onVisibilityChange } from '@pagenote/shared/lib/utils/document'
+import { ONE_MONTH_MILLION } from '~/const/time'
 const api = generateApi();
 
 
@@ -98,6 +99,7 @@ export default Vue.extend({
     save(data:Partial<WebPage>){
       api.lightpage.saveLightPage({
         key: this.pageKey,
+        updateAt: Date.now(),
         ...data
       }).then(()=> {
         this.getDetail()
@@ -108,7 +110,7 @@ export default Vue.extend({
     deletePage(){
       this.save({
         deleted: true,
-        expiredAt: Date.now() + 3600 * 1000 * 24 * 14
+        expiredAt: Date.now() + ONE_MONTH_MILLION
       })
     },
     revert(){
@@ -144,6 +146,8 @@ export default Vue.extend({
     white-space: nowrap;
     border-bottom: 1px dotted #dddddd;
     border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .actions{
     position: absolute;
