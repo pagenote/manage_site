@@ -53,18 +53,18 @@ export default Vue.extend({
         //   title: '画笔设置',
         //   link: '/setting'
         // },
-        {
-          title: '数据同步',
-          link: '/setting/files',
-        },
+        // {
+        //   title: '数据同步',
+        //   link: '/setting/files',
+        // },
         {
           title: '搜索引擎联动',
           link: '/setting/search'
         },
-        {
-          title: '剪切板',
-          link: '/setting/clipboard'
-        },
+        // {
+        //   title: '剪切板',
+        //   link: '/setting/clipboard'
+        // },
         // {
         //   title: '禁用管理',
         //   link: '/setting/disallow'

@@ -9,5 +9,8 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'EmptyLayout',
+  mounted() {
+    console.log('this.$route',this.$route)
+  }
 })
 </script>

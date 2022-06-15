@@ -62,6 +62,7 @@ const exportPages = (pages: WebPage[]) => {
   const version = '0.20.14'
   const dataString = makeExportString({
     pages,
+    resources: [],
     version: 2,
     extension_version: version,
     backup_at: Date.now(),
