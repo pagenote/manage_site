@@ -1,6 +1,6 @@
 <template>
   <div class='web-page-detail'>
-    <div v-if='webpage'>
+    <template v-if='webpage'>
       <v-overlay
         v-if='webpage.deleted'
         absolute
@@ -18,6 +18,12 @@
         </v-btn>
       </v-overlay>
       <div class='title'>
+        <label-edit
+          :text='title'
+          placeholder='点击添加标题'
+          @text-updated='textUpdated'
+          @text-updated-blur='textUpdated'
+          @text-updated-enter='textUpdated'></label-edit>
         <span> <a :href='webpage.url || webpage.key' target='_blank'>{{webpage.title || webpage.url || webpage.key}}</a> </span>
         <div class='actions'>
           <v-btn
@@ -31,16 +37,27 @@
       </div>
 
       <div class='abstract'>
-        <step-line v-for='(light,index) in webpage.plainData.steps' :key='light.id+index' :dense='false' :show-tip='true' :show-context='true' :light='light' />
+        <step-line
+         v-for='(light,index) in webpage.plainData.steps'
+         :key='light.id+index'
+         :dense='false'
+         :show-tip='true'
+         :show-context='true'
+         :light='light'
+         @edit='(step)=>onEditLight(step,index)'
+        />
       </div>
-      <div class='footer'>
+      <div class='snapshots'>
         <v-flex>
           <div v-for='(snapshot,index) in webpage.plainData.snapshots' :key='index'>
             <v-img sizes='24' :src='snapshot' :alt='index' />
           </div>
         </v-flex>
       </div>
-    </div>
+      <aside class='footer'>
+        <span>修改于 {{webpage.updateAt | past}}</span>
+      </aside>
+    </template>
     <div v-else>
 
     </div>
@@ -50,7 +67,7 @@
 <script lang='ts'>
 import Vue, { PropType } from 'vue'
 import generateApi from '@pagenote/shared/lib/generateApi'
-import { WebPage } from '@pagenote/shared/lib/@types/data'
+import { Step, WebPage } from '@pagenote/shared/lib/@types/data'
 import { onVisibilityChange } from '@pagenote/shared/lib/utils/document'
 import { ONE_MONTH_MILLION } from '~/const/time'
 const api = generateApi();
@@ -60,6 +77,7 @@ const api = generateApi();
 
 interface Data {
   webpage?: WebPage
+  title: string
   // [key:string]: any,
 }
 
@@ -73,7 +91,8 @@ export default Vue.extend({
   },
   data(): Data {
     return {
-      webpage: undefined
+      webpage: undefined,
+      title: ''
     }
   },
   watch: {
@@ -88,6 +107,9 @@ export default Vue.extend({
     })
   },
   methods: {
+    textUpdated(text: string) {
+      this.title = text
+    },
     getDetail() {
       api.lightpage.getLightPageDetail({key:this.pageKey}).then((res)=>{
         if(res.success){
@@ -96,14 +118,31 @@ export default Vue.extend({
       })
     },
 
-    save(data:Partial<WebPage>){
+    onEditLight(step:Step,index:number){
+      console.log(step,index,'修改')
+      const page = this.webpage;
+      if(!page){
+        return
+      }
+      if(step){
+        page.plainData.steps[index] = step;
+      }else{
+        page.plainData.steps.splice(index,1)
+      }
+      this.save(page,false)
+    },
+
+    save(data:Partial<WebPage>,refresh=true){
       api.lightpage.saveLightPage({
+        ...this.webpage,
+        ...data,
         key: this.pageKey,
         updateAt: Date.now(),
-        ...data
       }).then(()=> {
-        this.getDetail()
-        this.$emit('changed',this.pageKey)
+        if(refresh){
+          this.getDetail()
+          this.$emit('changed',this.pageKey)
+        }
       })
     },
 
@@ -125,7 +164,6 @@ export default Vue.extend({
 
 <style scoped lang='scss'>
 .web-page-detail {
-  position: relative;
   font-size: 14px;
   background: rgb(249 249 249);
   border-radius: 8px;
@@ -157,5 +195,14 @@ export default Vue.extend({
   .abstract{
     padding:12px;
   }
+}
+
+aside.footer{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 12px;
+  font-size: 12px;
+  color: #999;
 }
 </style>

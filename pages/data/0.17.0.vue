@@ -63,6 +63,7 @@ export default Vue.extend({
         const formatPages = formatData(result.pages || [])
         if (formatPages?.length) {
           const str = makeExportString({
+            resources: [],
             pages: formatPages,
             version: BackupVersion.version1,
             extension_version: '0.17.0',

@@ -21,10 +21,16 @@ export default {
   css: ['~/assets/global.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/time.ts'],
+  plugins: [
+    '~/plugins/time.ts',
+    {
+      src: '~/plugins/components.js',
+      mode: 'client',
+    },
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
-  components: true,
+  components: [{ path: '~/components', extensions: ['vue'] }],
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
@@ -44,7 +50,7 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa',
+    // '@nuxtjs/pwa',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -54,11 +60,11 @@ export default {
   },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
-  pwa: {
-    manifest: {
-      lang: 'en',
-    },
-  },
+  // pwa: {
+  //   manifest: {
+  //     lang: 'en',
+  //   },
+  // },
   // https://google-fonts.nuxtjs.org/options
   googleFonts: {
     download: true,
@@ -104,6 +110,27 @@ export default {
     },
   },
 
+  ssr: false,
+  router: {
+    // middleware: 'redirect',
+    // base: '/web/',
+    extendRoutes(routes) {
+      routes.forEach(function (item) {
+        routes.push({
+          name: item.name,
+          path: item.path + '.html',
+          component: item.component,
+        })
+      })
+    },
+  },
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    publicPath: '/bundle/',
+  },
+  generate: {
+    devtools: true,
+    fallback: 'highlight.html',
+    subFolders: false,
+  },
 }

@@ -1,7 +1,10 @@
 <template>
   <v-main class='highlight-page'>
     <v-row no-gutters class='fill-height'>
-      <v-col cols='4' class='middle-part'>
+      <v-col cols='2' class='filter-part'>
+        <filters @onFilterChange='onFilterChange'></filters>
+      </v-col>
+      <v-col cols='4' class='abstract-part'>
         <div class='cards-container'>
           <div v-for='(i,index) in abstractList' :key='i.key' @click='setFocusKey(i.key)'>
             <AbstractPageCard
@@ -9,8 +12,8 @@
               :checked='batchSelected.includes(i.key)'
               :light-cnt='i.lightCnt'
               :page-key='i.key'
-              :fetch-timeout='changedKey === i.key?0: (index>10?index*10000:(index-1)*40)'
-              @toggleCheck='onToggleChecked'  />
+              :fetch-timeout='changedKey === i.key?0: (index>10?index*10000:(index)*40)'
+              @toggleCheck='onToggleChecked' />
           </div>
         </div>
         <div class='abstract-list-footer'>
@@ -81,9 +84,8 @@
             </v-card>
           </v-dialog>
         </div>
-
       </v-col>
-      <v-col cols='8' class='fill-height'>
+      <v-col cols='6' class='content-part'>
         <web-page-detail :key='focusKey+changedKey' :page-key='focusKey' @changed='onDetailChange' />
       </v-col>
     </v-row>
@@ -95,10 +97,10 @@ import Vue from 'vue'
 import { WebPage } from '@pagenote/shared/lib/@types/data'
 import getCacheInstance from '@pagenote/shared/lib/library/cache'
 import generateApi from '@pagenote/shared/lib/generateApi'
-import { onVisibilityChange } from '@pagenote/shared/lib/utils/document'
 import { lightpage } from '@pagenote/shared/lib/extApi'
-import Keys = lightpage.Keys
+import { Query } from '@pagenote/shared/lib/@types/database'
 import { ONE_MONTH_MILLION } from '~/const/time'
+import Keys = lightpage.WebPageKeys
 const api = generateApi();
 const cacheFocus = getCacheInstance<string>('last_focus')
 enum ACTIONS {
@@ -116,12 +118,14 @@ export default Vue.extend({
     changedKey: string
     batchSelected: string[]
     showBatchDialog: boolean
-    batchAction: ACTIONS
+    batchAction: ACTIONS,
+    selectedDays: string[],
+    selectedTags: string[],
   }{
     return {
       items: [{
         text: '按修改时间',
-        value: 'updateAtDay'
+        value: 'updateAt'
       },{
         text: '按域名分组',
         value: 'domain'
@@ -129,13 +133,15 @@ export default Vue.extend({
         text: '按标签分组',
         value: 'domain'
       }],
-      groupType: 'updateAtDay',
+      groupType: 'updateAt',
       abstractList: [],
       focusKey: '',
       changedKey: '',
       batchSelected: [],
       showBatchDialog: false,
-      batchAction: ACTIONS.DELETE
+      batchAction: ACTIONS.DELETE,
+      selectedDays: [],
+      selectedTags: [],
     }
   },
   computed: {
@@ -145,12 +151,15 @@ export default Vue.extend({
   },
   mounted() {
     this.focusKey = cacheFocus.get();
-    this.getAbstracts();
-    onVisibilityChange(()=>{
-      this.getAbstracts()
-    })
+    // this.getAbstracts();
+    // onVisibilityChange(()=>{
+    //   this.getAbstracts()
+    // })
   },
   methods: {
+    onFilterChange(query:any){
+      this.getAbstracts(query)
+    },
     setFocusKey(key:string) {
       this.focusKey = key
       cacheFocus.set(key)
@@ -158,18 +167,16 @@ export default Vue.extend({
     onDetailChange(key:string){
       this.changedKey = key
     },
-    getAbstracts(){
+    getAbstracts(query:Query<Keys>={deleted: false}){
       api.lightpage.getLightPages({
-        query:{
-          deleted: false
-        },
+        query,
         sort:{
           [this.groupType]: -1,
         },
-        limit: 500,
+        limit: 9999,
         ignoreDetail: true,
       }).then((result)=> {
-        console.log('pages 摘要信息集合',result)
+        // console.log(query,'pages 摘要信息集合',result)
         if(result.success){
           const data = result.data.pages as Keys[];
           this.abstractList = data
@@ -242,8 +249,8 @@ export default Vue.extend({
 @import "assets/variables.scss";
 .highlight-page{
   position: relative;
-  margin: 16px;
-  height: calc(100vh - 32px);
+  margin: 8px;
+  height: calc(100vh - 24px);
   display: flex;
   padding: 12px;
   overflow: hidden;
@@ -252,10 +259,14 @@ export default Vue.extend({
   border-radius: 8px;
 }
 
-.middle-part{
+.filter-part{
+  border-right: 1px solid #ededed;
+}
+.content-part,.abstract-part{
   position: relative;
   max-height: calc(100% - 0px);
 }
+
 .cards-container{
   position: relative;
   overflow: auto;

@@ -67,6 +67,7 @@ export default Vue.extend({
             version: BackupVersion.version1,
             extension_version: '0.15.7',
             backup_at: Date.now(),
+            resources: [],
           })
           contentToFile(str, `0.15.7.${formatPages.length}.pagenote`)
         } else {

@@ -8,13 +8,14 @@
         </span>
       <span v-if='showContext'>{{light.suffix}}</span>
     </div>
-    <div v-if='showTip' class='annotation' contenteditable='true' v-html='light.tip'></div>
+    <div v-if='showTip' class='annotation' contenteditable='true' @input='onInput' v-html='light.tip'></div>
   </div>
 </template>
 
 <script lang='ts'>
 import Vue,{PropType} from 'vue'
 import { Step } from '@pagenote/shared/lib/@types/data'
+import debounce from 'lodash/debounce'
 
 export default Vue.extend({
   name: 'StepLine',
@@ -35,6 +36,18 @@ export default Vue.extend({
       type: Boolean,
       default: true,
     }
+  },
+  methods: {
+    onInput:debounce(function(e:InputEvent) {
+      // @ts-ignore
+      const value = e?.target?.innerHTML;
+      // @ts-ignore
+      this.$emit('edit',{
+        // @ts-ignore
+        ...this.light,
+        tip: value
+      })
+    },100)
   }
 })
 </script>
@@ -43,7 +56,6 @@ export default Vue.extend({
 .step-line {
   position: relative;
   margin: 12px 0;
-  position: relative;
   word-break: break-word;
   white-space: pre-line;
   padding-left: 16px;
@@ -51,11 +63,11 @@ export default Vue.extend({
     margin: 6px 0;
   }
 
-  &:hover{
-    .light-content{
-      background: #ededed;
-    }
-  }
+  //&:hover{
+  //  .light-content{
+  //    background: #ededed;
+  //  }
+  //}
 }
 .light-aside {
   top: 0;

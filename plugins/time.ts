@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+import { getDomain } from '@pagenote/shared/lib/utils/filter'
 dayjs.extend(duration)
 
 const countdownTime = function (date1: number, date2 = Date.now()) {
@@ -45,6 +46,33 @@ const computeLeftTimeWithLabel = function (
   return label
 }
 
+const computeTimeDiff = function (timeStamp: number): string {
+  if (!timeStamp) {
+    return ''
+  }
+  const tempTime = dayjs(+timeStamp)
+  const now = dayjs(new Date())
+  const diffDay = now.diff(tempTime, 'day')
+  if (diffDay > 30) {
+    const diffMonth = now.diff(tempTime, 'month')
+    return diffMonth + '个月前'
+  } else if (diffDay > 1) {
+    return diffDay + '天前'
+  } else {
+    const diffHours = now.diff(tempTime, 'hour')
+    if (diffHours > 1) {
+      return diffHours + '小时前'
+    } else {
+      const diffMinute = now.diff(tempTime, 'minute')
+      if (diffMinute > 1) {
+        return diffMinute + '分钟前'
+      } else {
+        return '片刻前'
+      }
+    }
+  }
+}
+
 /** Vue Filters Start */
 Vue.filter(
   'format',
@@ -55,4 +83,12 @@ Vue.filter(
 
 Vue.filter('countdown', function (text: string) {
   return computeLeftTimeWithLabel(+text)
+})
+
+Vue.filter('past', function (text: string) {
+  return computeTimeDiff(+text)
+})
+
+Vue.filter('domain', function (url: string) {
+  return url ? getDomain(url, true) : ''
 })

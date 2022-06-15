@@ -101,11 +101,11 @@ export default Vue.extend({
         //   title: '剪切板',
         //   to: '/clipboard',
         // },
-        {
-          icon: 'mdi-cogs',
-          title: '设置',
-          to: '/setting/files',
-        },
+        // {
+        //   icon: 'mdi-cogs',
+        //   title: '设置',
+        //   to: '/setting/files',
+        // },
         // {
         //   icon: 'mdi-chart-bubble',
         //   title: '设置',

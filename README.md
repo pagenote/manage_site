@@ -1,6 +1,12 @@
 # manage_site
+> 这是 pagenote 插件管理页的项目。
 
-## Build Setup
+## 技术栈
+* Vue.js
+* Nuxt.js
+* vuetify
+
+## 启动开发
 
 ```bash
 # install dependencies
@@ -8,61 +14,37 @@ $ npm install
 
 # serve with hot reload at localhost:3000
 $ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+```typescript
+// api 调用demo
+import generateApi from '@pagenote/shared/lib/generateApi'
+const api = generateApi();
 
-## Special Directories
+mounted(){
+  // 查询网页笔记
+  api.lightpage.getLightPages({
+    query:{
+      deleted: false,
+    },
+    sort:{
+      ['createAt']: -1,
+    },
+    limit: 9999,
+    ignoreDetail: false,
+  }).then((result)=> {
+    if(result.success){
+      // ....
+    }
+  })
+}
 
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
+```
 
-### `assets`
+## 部署服务
 
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
+### 自动部署（推荐）
+你可以基于此项目进行开发，开发完毕后提交 MR 到主分支，合并后将自动部署在 https://dev.pagenote.cn/highlight
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
-
-### `components`
-
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
-
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+### 自行部署
+你也可以自行部署在你自己的服务器上。部署方式见 [nuxt.js](https://www.nuxtjs.cn/) 
