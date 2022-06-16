@@ -110,20 +110,20 @@ export default {
     },
   },
 
-  ssr: false,
-  router: {
-    // middleware: 'redirect',
-    // base: '/web/',
-    extendRoutes(routes) {
-      routes.forEach(function (item) {
-        routes.push({
-          name: item.name,
-          path: item.path + '.html',
-          component: item.component,
-        })
-      })
-    },
-  },
+  // ssr: false,
+  // router: {
+  //   // middleware: 'redirect',
+  //   // base: '/web/',
+  //   extendRoutes(routes) {
+  //     routes.forEach(function (item) {
+  //       routes.push({
+  //         name: item.name,
+  //         path: item.path + '.html',
+  //         component: item.component,
+  //       })
+  //     })
+  //   },
+  // },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     publicPath: '/bundle/',
