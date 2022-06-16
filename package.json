@@ -29,7 +29,7 @@
     "@types/filesystem": "0.0.32",
     "core-js": "^3.19.3",
     "crypto-js": "^4.1.1",
-    "dayjs": "^1.11.1",
+    "dayjs": "^1.11.3",
     "dexie": "^3.2.2",
     "label-edit": "^0.1.1",
     "localforage": "^1.10.0",
