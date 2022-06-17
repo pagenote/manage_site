@@ -1,6 +1,6 @@
 <template>
   <div class='filter-by-colors'>
-<!--    <ColorMap />-->
+    <ColorMap />
     <ul>
       <li v-for='i in values' :key='i'>
         {{i.tagName}}

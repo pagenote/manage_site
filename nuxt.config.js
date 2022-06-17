@@ -50,7 +50,7 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa',
+    // '@nuxtjs/pwa',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -60,11 +60,11 @@ export default {
   },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
-  pwa: {
-    manifest: {
-      lang: 'zh',
-    },
-  },
+  // pwa: {
+  //   manifest: {
+  //     lang: 'zh',
+  //   },
+  // },
   // https://google-fonts.nuxtjs.org/options
   googleFonts: {
     download: true,
