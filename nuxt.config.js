@@ -110,7 +110,7 @@ export default {
     },
   },
 
-  ssr: false,
+  // ssr: false,
   router: {
     // middleware: 'redirect',
     // base: '/web/',
