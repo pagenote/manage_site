@@ -4,8 +4,7 @@
 
 <script>
 import Vue from 'vue'
-import generateApi from '@pagenote/shared/lib/generateApi'
-const api = generateApi();
+import api from '@pagenote/shared/lib/generateApi'
 
 export default Vue.extend({
   name: 'ListDayHeatMap',
