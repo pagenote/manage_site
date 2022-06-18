@@ -8,10 +8,9 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import generateApi from '@pagenote/shared/lib/generateApi'
+import api from '@pagenote/shared/lib/generateApi'
 import { lightpage } from '@pagenote/shared/lib/extApi'
 import Keys = lightpage.WebPageKeys
-const api = generateApi();
 
 interface Data{
   values: {

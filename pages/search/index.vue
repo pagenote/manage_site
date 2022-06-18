@@ -16,13 +16,11 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import generateApi from '@pagenote/shared/lib/generateApi'
+import api from '@pagenote/shared/lib/generateApi'
 // import addUrlChangeListener from '@pagenote/shared/lib/utils/history'
 import {parse} from 'query-string'
 import { lightpage } from '@pagenote/shared/lib/extApi'
 import Keys = lightpage.WebPageKeys
-
-const api = generateApi();
 
 const testData = [
   { key: 'test-data-1', value: 'test data 1' },

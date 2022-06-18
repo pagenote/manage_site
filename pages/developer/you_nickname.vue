@@ -14,9 +14,8 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import generateApi from '@pagenote/shared/lib/generateApi'
+import api from '@pagenote/shared/lib/generateApi'
 import { WebPage } from '@pagenote/shared/lib/@types/data'
-const api = generateApi();
 
 export default Vue.extend({
   name: 'YouNickname',
