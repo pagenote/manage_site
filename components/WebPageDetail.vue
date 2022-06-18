@@ -66,11 +66,10 @@
 
 <script lang='ts'>
 import Vue, { PropType } from 'vue'
-import generateApi from '@pagenote/shared/lib/generateApi'
+import api from '@pagenote/shared/lib/generateApi'
 import { Step, WebPage } from '@pagenote/shared/lib/@types/data'
 import { onVisibilityChange } from '@pagenote/shared/lib/utils/document'
 import { ONE_MONTH_MILLION } from '~/const/time'
-const api = generateApi();
 
 
 /** create at 2022/5/2 */

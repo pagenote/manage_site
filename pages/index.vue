@@ -3,7 +3,7 @@
     <section class="section1">
       <div class="content">
         <div class="menu py-4">
-          <v-btn elevation="0" outlined large href="/setting"> 管理 </v-btn>
+          <v-btn elevation="0" outlined large href="/highlight"> 管理 </v-btn>
         </div>
         <div class="install-guide">
           <h1 class="text-h2">

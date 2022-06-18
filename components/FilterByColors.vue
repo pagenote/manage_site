@@ -1,6 +1,6 @@
 <template>
   <div class='filter-by-colors'>
-<!--    <ColorMap />-->
+    <ColorMap />
     <ul>
       <li v-for='i in values' :key='i'>
         {{i.tagName}}
@@ -11,11 +11,10 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import generateApi from '@pagenote/shared/lib/generateApi'
+import api from '@pagenote/shared/lib/generateApi'
 import { lightpage } from '@pagenote/shared/lib/extApi'
 import ColorMap from '~/components/colormap/index.vue'
 import Keys = lightpage.WebPageKeys
-const api = generateApi();
 
 
 interface Data{

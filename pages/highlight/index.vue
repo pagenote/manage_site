@@ -96,12 +96,11 @@
 import Vue from 'vue'
 import { WebPage } from '@pagenote/shared/lib/@types/data'
 import getCacheInstance from '@pagenote/shared/lib/library/cache'
-import generateApi from '@pagenote/shared/lib/generateApi'
+import api from '@pagenote/shared/lib/generateApi'
 import { lightpage } from '@pagenote/shared/lib/extApi'
 import { Query } from '@pagenote/shared/lib/@types/database'
 import { ONE_MONTH_MILLION } from '~/const/time'
 import Keys = lightpage.WebPageKeys
-const api = generateApi();
 const cacheFocus = getCacheInstance<string>('last_focus')
 enum ACTIONS {
   DELETE = 'delete',

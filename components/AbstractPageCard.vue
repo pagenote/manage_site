@@ -80,10 +80,9 @@
 <script lang='ts'>
 import Vue, { PropType } from 'vue'
 import { Step, WebPage } from '@pagenote/shared/lib/@types/data'
-import generateApi from '@pagenote/shared/lib/generateApi'
+import api from '@pagenote/shared/lib/generateApi'
 import { onElementViewChange } from '@pagenote/shared/lib/utils/document'
 
-const api = generateApi()
 let changeListener: () => void
 let fetchTimer: NodeJS.Timeout;
 export default Vue.extend({
