@@ -128,9 +128,4 @@ export default {
   build: {
     publicPath: '/bundle/',
   },
-  generate: {
-    devtools: true,
-    fallback: 'highlight.html',
-    subFolders: false,
-  },
 }
