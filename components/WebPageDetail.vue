@@ -18,21 +18,32 @@
         </v-btn>
       </v-overlay>
       <div class='title'>
-        <label-edit
-          :text='title'
-          placeholder='点击添加标题'
-          @text-updated='textUpdated'
-          @text-updated-blur='textUpdated'
-          @text-updated-enter='textUpdated'></label-edit>
-        <span> <a :href='webpage.url || webpage.key' target='_blank'>{{webpage.title || webpage.url || webpage.key}}</a> </span>
+<!--        <label-edit-->
+<!--          :text='title'-->
+<!--          placeholder='点击添加标题'-->
+<!--          @text-updated='textUpdated'-->
+<!--          @text-updated-blur='textUpdated'-->
+<!--          @text-updated-enter='textUpdated'></label-edit>-->
+        <span>
+          <img class='icon' :src="webpage.icon">
+          <a :href='webpage.url || webpage.key' target='_blank'>{{webpage.title || webpage.url || webpage.key}}</a>
+        </span>
         <div class='actions'>
+          <m-switch v-model='showContext'></m-switch>
           <v-btn
             elevation="2"
             icon
             x-small
-            color='red'
+            color='#ff8383'
             @click='deletePage'
           ><v-icon>mdi-delete</v-icon></v-btn>
+          <v-btn
+            elevation="2"
+            icon
+            x-small
+            color='#ff8383'
+            @click='deletePage'
+          ><v-icon>mdi-markdown</v-icon></v-btn>
         </div>
       </div>
 
@@ -42,7 +53,7 @@
          :key='light.id+index'
          :dense='false'
          :show-tip='true'
-         :show-context='true'
+         :show-context='showContext'
          :light='light'
          @edit='(step)=>onEditLight(step,index)'
         />
@@ -50,7 +61,7 @@
       <div class='snapshots'>
         <v-flex>
           <div v-for='(snapshot,index) in webpage.plainData.snapshots' :key='index'>
-            <v-img sizes='24' :src='snapshot' :alt='index' />
+            <v-img sizes='24' :src='snapshot' />
           </div>
         </v-flex>
       </div>
@@ -69,7 +80,9 @@ import Vue, { PropType } from 'vue'
 import api from '@pagenote/shared/lib/generateApi'
 import { Step, WebPage } from '@pagenote/shared/lib/@types/data'
 import { onVisibilityChange } from '@pagenote/shared/lib/utils/document'
+import getCacheInstance from '@pagenote/shared/lib/library/cache'
 import { ONE_MONTH_MILLION } from '~/const/time'
+import MSwitch from '~/components/Switch.vue'
 
 
 /** create at 2022/5/2 */
@@ -77,11 +90,15 @@ import { ONE_MONTH_MILLION } from '~/const/time'
 interface Data {
   webpage?: WebPage
   title: string
+  showContext: boolean
   // [key:string]: any,
 }
 
+const contextMode = getCacheInstance<boolean>('mode', { defaultValue: false })
+
 export default Vue.extend({
   name: 'WebPageDetail',
+  components: { MSwitch },
   props: {
     pageKey: {
       type: String as PropType<string>,
@@ -91,12 +108,16 @@ export default Vue.extend({
   data(): Data {
     return {
       webpage: undefined,
-      title: ''
+      title: '',
+      showContext: contextMode.get(),
     }
   },
   watch: {
     pageKey() {
       this.getDetail()
+    },
+    showContext(val){
+      contextMode.set(val)
     }
   },
   mounted() {
@@ -173,23 +194,43 @@ export default Vue.extend({
   box-shadow: 0 0 3px 1px #eae6e6;
   line-height: 1.4em;
   vertical-align: top;
+  .icon{
+    width: 24px;
+    height: 24px;
+    border-raduis: 10px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: #fff;
+  }
   .title{
     top: 0;
-    padding: 6px 4px;
+    padding: 8px;
     z-index: 1;
     position: sticky;
-    font-size: 14px;
     background: rgba(255,255,255,0.95);
     white-space: nowrap;
     border-bottom: 1px dotted #dddddd;
     border-radius: 8px 8px 0 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    a{
+      font-size: 14px;
+      display: inline-block;
+      overflow: hidden;
+      max-width: 440px;
+      text-overflow: ellipsis;
+      text-decoration: none;
+      vertical-align: sub;
+    }
   }
   .actions{
+    width: 148px;
     position: absolute;
+    display: flex;
+    align-items: center;
     right: 12px;
-    top:4px;
+    top: 12px;
+    justify-content: space-between;
   }
   .abstract{
     padding:12px;

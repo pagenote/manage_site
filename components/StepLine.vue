@@ -1,7 +1,7 @@
 <template>
   <div class="step-line" :style="`--color:${light.bg}`" :class='{"dense":dense}'>
-    <aside class="light-aside"></aside>
     <div class="light-content" :class='{"show-context":showContext}'>
+      <aside class="light-aside"></aside>
       <span v-if='showContext'>{{light.pre}}</span>
       <span class="text">
           {{light.text}}
@@ -32,6 +32,7 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+    // 紧凑模式，摘要卡片显示
     dense:{
       type: Boolean,
       default: true,
@@ -56,23 +57,29 @@ export default Vue.extend({
 .step-line {
   position: relative;
   margin: 12px 0;
-  word-break: break-word;
-  white-space: pre-line;
-  padding-left: 16px;
+  &:hover{
+    .light-content{
+      background: #ededed;
+    }
+  }
   &.dense{
     margin: 6px 0;
-  }
+    .light-content{
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .text{
 
-  //&:hover{
-  //  .light-content{
-  //    background: #ededed;
-  //  }
-  //}
+    }
+  }
 }
+
 .light-aside {
   top: 0;
   fill: var(--color);
-  left: 0;
+  left: 0px;
   width: 5px;
   cursor: move;
   height: 100%;
@@ -80,15 +87,15 @@ export default Vue.extend({
   background: var(--color);
   border-radius: 12px;
 }
+
 .light-content {
   color: rgba(0, 0, 0, 0.7);
   font-weight: bold;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  position: relative;
+  padding-left: 14px;
   &.show-context{
     white-space: normal;
-    overflow: auto;
+    overflow: unset;
     .text{
       background-color: var(--color);
     }
