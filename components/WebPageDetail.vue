@@ -35,9 +35,9 @@
             icon
             x-small
             color='#ff8383'
-            @click='deletePage'
+            @click='exportMarkdown'
           >
-            <v-icon>mdi-delete</v-icon>
+            <v-icon>{{ exportIcon }}</v-icon>
           </v-btn>
           <v-btn
             elevation='2'
@@ -46,7 +46,7 @@
             color='#ff8383'
             @click='deletePage'
           >
-            <v-icon>mdi-markdown</v-icon>
+            <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
       </div>
@@ -90,10 +90,15 @@
 import Vue, { PropType } from 'vue'
 import api from '@pagenote/shared/lib/generateApi'
 import { Step, WebPage } from '@pagenote/shared/lib/@types/data'
-import { onVisibilityChange } from '@pagenote/shared/lib/utils/document'
+import { contentToFile, onVisibilityChange } from '@pagenote/shared/lib/utils/document'
 import getCacheInstance from '@pagenote/shared/lib/library/cache'
+import { predefinedSchemaMap } from '@pagenote/shared/lib/pagenote-convert/predefined'
+import { convertDataToString } from '@pagenote/shared/lib/pagenote-convert'
+// @ts-ignore
+import showToast from 'show-toast'
 import { ONE_MONTH_MILLION } from '~/const/time'
 import MSwitch from '~/components/Switch.vue'
+import { writeTextToClipboard } from '~/utils/template'
 
 
 /** create at 2022/5/2 */
@@ -104,11 +109,12 @@ interface Data {
   showContext: boolean
   tag: string,
   tags: { text: string }[],
+  exportIcon: string
   // [key:string]: any,
 }
 
 const contextMode = getCacheInstance<boolean>('mode', { defaultValue: false })
-
+const markdownIcon = 'mdi-alpha-m'
 export default Vue.extend({
   name: 'WebPageDetail',
   components: { MSwitch },
@@ -124,7 +130,8 @@ export default Vue.extend({
       title: '',
       showContext: contextMode.get(),
       tag: '',
-      tags: []
+      tags: [],
+      exportIcon: markdownIcon
     }
   },
   watch: {
@@ -133,7 +140,7 @@ export default Vue.extend({
     },
     showContext(val) {
       contextMode.set(val)
-    },
+    }
   },
   mounted() {
     this.getDetail()
@@ -142,11 +149,11 @@ export default Vue.extend({
     })
   },
   methods: {
-    onTagsChange(tags:{text: string}[]){
-      this.tags = tags;
+    onTagsChange(tags: { text: string }[]) {
+      this.tags = tags
       this.save({
         // @ts-ignore
-        plainData:{
+        plainData: {
           categories: tags.map(function(item) {
             return item.text
           })
@@ -167,6 +174,35 @@ export default Vue.extend({
           })
         }
       })
+    },
+
+    exportMarkdown() {
+      if (this.webpage) {
+        const data = convertDataToString(this.webpage, predefinedSchemaMap.markdown)
+        const downloadIcon = 'mdi-download-outline'
+        if (this.exportIcon === downloadIcon) {
+          const filename = this.webpage.url || this.webpage.key
+          contentToFile(data, filename + '.md')
+          this.exportIcon = markdownIcon
+          showToast({
+            str: '已成功导出文件',
+            time: 1500,
+            position: 'top'
+          })
+        } else {
+          writeTextToClipboard(data).then(() => {
+            this.exportIcon = downloadIcon
+            setTimeout(() => {
+              this.exportIcon = markdownIcon
+            }, 1000)
+            showToast({
+              str: '已复制至剪切板，继续点击将导出为文件',
+              time: 1500,
+              position: 'top'
+            })
+          })
+        }
+      }
     },
 
     onEditLight(step: Step, index: number) {
