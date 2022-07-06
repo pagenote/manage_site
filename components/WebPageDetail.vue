@@ -52,15 +52,25 @@
       </div>
 
       <div class='abstract'>
-        <step-line
-          v-for='(light,index) in webpage.plainData.steps'
-          :key='light.id+index'
-          :dense='false'
-          :show-tip='true'
-          :show-context='showContext'
-          :light='light'
-          @edit='(step)=>onEditLight(step,index)'
-        />
+        <draggable
+          :list='steps'
+          v-bind="dragOptions"
+          handle=".light-aside"
+          @start="drag = true"
+          @end="onDragEnd"
+        >
+          <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+            <step-line
+              v-for='(light,index) in steps'
+              :key='light.id + light.lightId'
+              :dense='false'
+              :show-tip='true'
+              :show-context='showContext'
+              :light='light'
+              @edit='(step)=>onEditLight(step,index)'
+            />
+          </transition-group>
+        </draggable>
       </div>
       <div class='snapshots'>
         <v-flex>
@@ -96,6 +106,8 @@ import { predefinedSchemaMap } from '@pagenote/shared/lib/pagenote-convert/prede
 import { convertDataToString } from '@pagenote/shared/lib/pagenote-convert'
 // @ts-ignore
 import showToast from 'show-toast'
+// @ts-ignore
+import Draggable from 'vuedraggable'
 import { ONE_MONTH_MILLION } from '~/const/time'
 import MSwitch from '~/components/Switch.vue'
 import { writeTextToClipboard } from '~/utils/template'
@@ -110,6 +122,7 @@ interface Data {
   tag: string,
   tags: { text: string }[],
   exportIcon: string
+  drag: boolean
   // [key:string]: any,
 }
 
@@ -117,7 +130,7 @@ const contextMode = getCacheInstance<boolean>('mode', { defaultValue: false })
 const markdownIcon = 'mdi-alpha-m'
 export default Vue.extend({
   name: 'WebPageDetail',
-  components: { MSwitch },
+  components: { MSwitch, Draggable },
   props: {
     pageKey: {
       type: String as PropType<string>,
@@ -131,7 +144,21 @@ export default Vue.extend({
       showContext: contextMode.get(),
       tag: '',
       tags: [],
-      exportIcon: markdownIcon
+      exportIcon: markdownIcon,
+      drag: false,
+    }
+  },
+  computed: {
+    dragOptions() {
+      return {
+        animation: 200,
+        group: "description",
+        disabled: false,
+        ghostClass: "ghost"
+      };
+    },
+    steps(): Step[]{
+      return this.webpage?.plainData?.steps || []
     }
   },
   watch: {
@@ -163,15 +190,27 @@ export default Vue.extend({
     textUpdated(text: string) {
       this.title = text
     },
+
     getDetail() {
       api.lightpage.getLightPageDetail({ key: this.pageKey }).then((res) => {
         if (res.success) {
-          this.webpage = res.data
-          this.tags = (this.webpage?.plainData?.categories || this.webpage.tags).map(function(item) {
+          const webpage = res.data;
+          this.webpage = webpage
+          this.tags = (webpage.plainData?.categories || webpage?.tags || []).map(function(item) {
             return {
               text: item
             }
           })
+        }
+      })
+    },
+
+    onDragEnd(){
+      this.drag = false;
+      this.save({
+        // @ts-ignore
+        plainData:{
+          steps: this.steps,
         }
       })
     },
