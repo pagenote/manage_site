@@ -27,9 +27,12 @@
               </v-avatar>
             </div>
             <div class='page-title'>
-                {{ webpage.title || webpage.plainData.title || webpage.description || webpage.plainData.description || webpage.url || webpage.key }}
+              {{ webpage.title || webpage.plainData.title || webpage.description || webpage.plainData.description || webpage.url || webpage.key
+              }}
             </div>
-            <a class='domain-link' target='_blank' :title='webpage.url || webpage.key' :href='webpage.url || webpage.key'>
+            <a
+              class='domain-link' target='_blank' :title='webpage.url || webpage.key'
+              :href='webpage.url || webpage.key'>
               {{ (webpage.url || webpage.key) | domain }}
             </a>
             <!--            <div>-->
@@ -84,7 +87,7 @@ import api from '@pagenote/shared/lib/generateApi'
 import { onElementViewChange } from '@pagenote/shared/lib/utils/document'
 
 let changeListener: () => void
-let fetchTimer: NodeJS.Timeout;
+let fetchTimer: NodeJS.Timeout
 export default Vue.extend({
   name: 'AbstractPageCard',
   components: {
@@ -131,7 +134,7 @@ export default Vue.extend({
       webpage: undefined,
       fetchTimes: 0,
       loading: true,
-      showAll: false,
+      showAll: false
     }
   },
   computed: {
@@ -140,7 +143,7 @@ export default Vue.extend({
     },
     left4Lights(): Step[] {
       return this.webpage?.plainData.steps.slice(3) || []
-    },
+    }
   },
   watch: {
     fetchTimeout() {
@@ -151,7 +154,6 @@ export default Vue.extend({
 
   },
   mounted() {
-    console.log(this.fetchTimeout,this.pageKey)
     fetchTimer = setTimeout(() => {
       if (!this.webpage) {
         // console.log(this.fetchTimes, this.pageKey)
@@ -166,7 +168,7 @@ export default Vue.extend({
     const rootEl: Element = this.$refs.root
     if (rootEl) {
       // const lastFetchAt = Date.now()
-      changeListener = onElementViewChange(rootEl, { threshold: [0, 0.2,0.5,1] }, (_ratio, visible) => {
+      changeListener = onElementViewChange(rootEl, { threshold: [0, 0.2, 0.5, 1] }, (_ratio, visible) => {
         // const diff = Date.now() - lastFetchAt
         if (visible) {
           this.getDetail()
@@ -247,10 +249,10 @@ export default Vue.extend({
     margin: 0;
   }
 
-  .aside-icon{
+  .aside-icon {
     position: absolute;
     left: 0;
-    top:0;
+    top: 0;
     width: 24px;
     height: 24px;
   }
@@ -273,7 +275,7 @@ export default Vue.extend({
     }
   }
 
-  .page-title{
+  .page-title {
     display: inline-block;
     max-width: 70%;
     overflow: hidden;
@@ -281,7 +283,7 @@ export default Vue.extend({
     margin-left: 24px;
   }
 
-  .domain-link{
+  .domain-link {
     position: absolute;
     right: 0;
     font-size: 12px;
@@ -293,20 +295,24 @@ export default Vue.extend({
   }
 }
 
-.abstract-detail{
+.abstract-detail {
   display: flex;
   justify-content: space-between;
-  .lights{
+
+  .lights {
     flex-shrink: 1;
     max-width: 100%;
-    &.mini{
+
+    &.mini {
       width: calc(100% - 100px);
     }
   }
-  .thumb{
+
+  .thumb {
     width: 80px;
     flex-shrink: 0;
-    img{
+
+    img {
       width: 80px;
       height: 50px;
     }

@@ -245,7 +245,6 @@ export default Vue.extend({
     },
 
     onEditLight(step: Step, index: number) {
-      console.log(step, index, '修改')
       const page = this.webpage
       if (!page) {
         return

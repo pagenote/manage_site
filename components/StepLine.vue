@@ -2,6 +2,17 @@
   <div class="step-line" :style="`--color:${light.bg}`" :class='{"dense":dense}'>
     <div class="light-content" :class='{"show-context":showContext}'>
       <aside class="light-aside"></aside>
+      <aside class='light-actions'>
+        <v-btn
+          elevation='2'
+          icon
+          x-small
+          color='#ff8383'
+          @click='deleteLine'
+        >
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </aside>
       <span v-if='showContext'>{{light.pre}}</span>
       <span class="text">
           {{light.text}}
@@ -48,7 +59,11 @@ export default Vue.extend({
         ...this.light,
         tip: value
       })
-    },100)
+    },100),
+
+    deleteLine(){
+      this.$emit('edit',null)
+    }
   }
 })
 </script>
@@ -61,6 +76,9 @@ export default Vue.extend({
     .light-content{
       background: #ededed;
     }
+    .light-actions{
+      display: block;
+    }
   }
   &.dense{
     margin: 6px 0;
@@ -70,8 +88,8 @@ export default Vue.extend({
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .text{
-
+    .light-actions{
+      display: none !important;
     }
   }
 }
@@ -86,6 +104,12 @@ export default Vue.extend({
   position: absolute;
   background: var(--color);
   border-radius: 12px;
+}
+
+.light-actions{
+  position: absolute;
+  right: 0;
+  display: none;
 }
 
 .light-content {
