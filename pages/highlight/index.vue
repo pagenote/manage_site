@@ -25,6 +25,9 @@
             :ripple='false'
             @input='toggleAllChecked'>
           </v-simple-checkbox>
+          <span v-if='batchSelected.length===0'>
+            当前页共 {{abstractList.length}} 个网页笔记
+          </span>
           <v-dialog
             v-if='batchSelected.length>0'
             v-model="showBatchDialog"
@@ -191,7 +194,7 @@ export default Vue.extend({
       //
     },
 
-    saveWebpage(data:Partial<WebPage>){
+    saveWebpage(data:Partial<WebPage>={}){
       return api.lightpage.saveLightPage({
         ...data,
         updateAt: Date.now(),

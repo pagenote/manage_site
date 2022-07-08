@@ -62,7 +62,7 @@
           <transition-group type="transition" :name="!drag ? 'flip-list' : null">
             <step-line
               v-for='(light,index) in steps'
-              :key='light.id + light.lightId'
+              :key='index+light.id + light.lightId'
               :dense='false'
               :show-tip='true'
               :show-context='showContext'
@@ -74,7 +74,7 @@
       </div>
       <div class='snapshots'>
         <v-flex>
-          <div v-for='(snapshot,index) in webpage.plainData.snapshots' :key='index'>
+          <div v-for='(snapshot,index) in snapshots' :key='index'>
             <v-img sizes='24' :src='snapshot' />
           </div>
         </v-flex>
@@ -159,6 +159,9 @@ export default Vue.extend({
     },
     steps(): Step[]{
       return this.webpage?.plainData?.steps || []
+    },
+    snapshots(): string[]{
+      return this.webpage?.plainData?.snapshots || []
     }
   },
   watch: {
@@ -196,7 +199,7 @@ export default Vue.extend({
         if (res.success) {
           const webpage = res.data;
           this.webpage = webpage
-          this.tags = (webpage.plainData?.categories || webpage?.tags || []).map(function(item) {
+          this.tags = (webpage?.plainData?.categories || webpage?.tags || []).map(function(item) {
             return {
               text: item
             }
@@ -355,7 +358,7 @@ aside.footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: 8px 12px;
   font-size: 12px;
   color: #999;
   background: #fff;

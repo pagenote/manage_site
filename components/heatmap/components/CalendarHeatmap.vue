@@ -285,7 +285,7 @@ g.day{
 svg.vch-wrapper {
   width: 100%;
   height: 100%;
-  max-height: 660px;
+  max-height: 620px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   line-height: 10px;
 }

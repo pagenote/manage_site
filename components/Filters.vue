@@ -22,6 +22,9 @@
         <filter-by-colors v-if="currentTab === 'colors'" />
       </keep-alive>
     </div>
+    <div class='filter-footer'>
+      <DataCenter />
+    </div>
   </div>
 </template>
 
@@ -82,7 +85,7 @@ export default Vue.extend({
         }, {
           title: '标签',
           value: CurrentType.tags
-        },
+        }
         // {
         //   title: '颜色',
         //   value: CurrentType.color
@@ -93,28 +96,32 @@ export default Vue.extend({
       ]
     }
   },
-  mounted() {
-    const defaultData = { currentTab: CurrentType.recent, tags: [], dateRange: [] }
-    const { dataRange, tags, currentTab } = parse(window.location.search)
-    const currentFilter = filterCache.get(defaultData) || defaultData
-    if (dataRange) {
-      currentFilter.dateRange = typeof dataRange === 'string' ? [dataRange] : dataRange
-    }
-    if (tags) {
-      currentFilter.tags = typeof tags === 'string' ? [tags] : tags
-    }
-    if (currentTab && TABS.includes(currentTab?.toString() as CurrentType)) {
-      currentFilter.currentTab = currentTab.toString()
-    }
-    filterCache.set(currentFilter)
-
-    const cacheFilter = filterCache.get(defaultData) || defaultData
-    this.dateRange = cacheFilter.dateRange
-    this.tags = cacheFilter.tags
-    this.currentTab = cacheFilter.currentTab
+  created() {
+    this.init();
     this.triggerFilter()
   },
   methods: {
+    init(){
+      const defaultData = { currentTab: CurrentType.recent, tags: [], dateRange: [] }
+      const { dataRange, tags, currentTab } = parse(window.location.search)
+      const currentFilter = filterCache.get(defaultData) || defaultData
+      if (dataRange) {
+        currentFilter.dateRange = typeof dataRange === 'string' ? [dataRange] : dataRange
+      }
+      if (tags) {
+        currentFilter.tags = typeof tags === 'string' ? [tags] : tags
+      }
+      if (currentTab && TABS.includes(currentTab?.toString() as CurrentType)) {
+        currentFilter.currentTab = currentTab.toString()
+      }
+      filterCache.set(currentFilter)
+
+      const cacheFilter = filterCache.get(defaultData) || defaultData
+      this.dateRange = cacheFilter.dateRange
+      this.tags = cacheFilter.tags
+      this.currentTab = cacheFilter.currentTab
+    },
+
     onDayRangeChange(days: {
       colorIndex: number,
       count: number,
@@ -196,6 +203,13 @@ export default Vue.extend({
   .tab-content {
     width: 100%;
     height: 100%;
+  }
+
+  .filter-footer {
+    width: 200px;
+    position: absolute;
+    bottom: 0;
+    padding: 8px 40px;
   }
 
   .day-heatmap {
