@@ -277,7 +277,7 @@ g.day{
   }
   &.active{
     rect.vch-day-square{
-      stroke: #ff3a51 !important;
+      stroke: #6aaaff !important;
       stroke-width: 1px;
     }
   }

@@ -103,10 +103,10 @@ export default Vue.extend({
   methods: {
     init(){
       const defaultData = { currentTab: CurrentType.recent, tags: [], dateRange: [] }
-      const { dataRange, tags, currentTab } = parse(window.location.search)
-      const currentFilter = filterCache.get(defaultData) || defaultData
-      if (dataRange) {
-        currentFilter.dateRange = typeof dataRange === 'string' ? [dataRange] : dataRange
+      const { dateRange, tags, currentTab } = parse(window.location.search)
+      const currentFilter = filterCache.get(defaultData);
+      if (dateRange) {
+        currentFilter.dateRange = typeof dateRange === 'string' ? [dateRange] : dateRange
       }
       if (tags) {
         currentFilter.tags = typeof tags === 'string' ? [tags] : tags
